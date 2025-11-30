@@ -1,0 +1,80 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  name     String?
+  slack_id String?
+  role     String?
+  settings Json?
+}
+
+model Repos {
+  id                 String  @id @default(cuid())
+  owner              String
+  name               String
+  project_profile_id String?
+
+  profile ProjectProfile? @relation(fields: [project_profile_id], references: [id])
+
+  prs PR[]
+}
+
+model PR {
+  id             String    @id @default(cuid())
+  repo_id        String
+  pr_number      Int
+  head_sha       String
+  status         String?
+  last_review_at DateTime?
+
+  repo    Repos    @relation(fields: [repo_id], references: [id])
+  reviews Review[]
+}
+
+model Review {
+  id         String  @id @default(cuid())
+  pr_id      String
+  ai_version String?
+  summary    String?
+  findings   Json
+  feedback   Json?
+
+  pr PR @relation(fields: [pr_id], references: [id])
+}
+
+model ProjectProfile {
+  id          String   @id @default(cuid())
+  repo        String   @unique
+  language    String
+  linters     String[]
+  ignorePaths String[]
+  rulesJson   Json
+  modelPref   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  repos Repos[]
+}
+
+
+model KBPage {
+  id         String   @id @default(cuid())
+  repo       String
+  type       String
+  title      String
+  content    String
+  sourceIds  String[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
