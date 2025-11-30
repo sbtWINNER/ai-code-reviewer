@@ -1,4 +1,4 @@
-import { Rule } from "../rule.engine";
+import { Rule } from "../rule.engine.ts";
 
 export const noConsoleRule: Rule = {
   id: "no_console",
@@ -6,7 +6,7 @@ export const noConsoleRule: Rule = {
   severity: "style",
 
   run(content, filePath) {
-    const findings = [];
+    const findings: any[] = [];
     const lines = content.split("\n");
 
     lines.forEach((line, index) => {

@@ -39,10 +39,24 @@ new Worker(
     }
 
     // --- 4. Объединяем результаты
+    const aiFindings = Array.isArray((aiResult as any).findings)
+      ? (aiResult as any).findings
+      : (Array.isArray((aiResult as any).comments) ? (aiResult as any).comments : []).map((c: any, i: number) => ({
+          id: `ai_${i}`,
+          severity: (c.severity as string) || "info",
+          file: c.file || c.path || "",
+          line_start: c.line || null,
+          line_end: c.line || null,
+          message: c.text || c.body || "",
+          suggested_patch: "",
+          examples: [],
+          docs: []
+        }));
+
     const combined = {
       ...aiResult,
       findings: [
-        ...aiResult.findings,
+        ...aiFindings,
         ...staticFindings.map(f => ({
           id: "rule_" + f.ruleId,
           severity: f.severity,

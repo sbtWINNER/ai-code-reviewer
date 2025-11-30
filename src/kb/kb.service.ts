@@ -43,8 +43,8 @@ export class KBService {
     }
 
     // Собираем все сообщения
-    const allFindings = reviews.flatMap(r => (r.findings as any[]) || []);
-    const messages = allFindings.map(f => f.message || "").filter(Boolean);
+    const allFindings = reviews.flatMap((r: any) => (r.findings as any[]) || []);
+    const messages = allFindings.map((f: any) => f.message || "").filter(Boolean);
 
     // Генерируем статистику
     const mistakes = this.countMistakes(messages);

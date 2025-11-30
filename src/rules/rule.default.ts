@@ -1,4 +1,4 @@
-import { StaticRule, RuleFinding } from "./rule.types";
+import { StaticRule, RuleFinding } from "./rule.types.ts";
 
 function createPatternRule(
   id: string,

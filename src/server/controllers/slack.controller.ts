@@ -17,9 +17,22 @@ export class SlackController {
       const github = new GithubService();
 
       switch (action.action_id) {
-        case "post_to_pr":
-          await github.postReviewToPR(repo, pr_number, aiResult.findings);
-          break;
+        case "post_to_pr": {
+          // Convert findings/comments into GitHub review comments
+          const comments = (aiResult.findings || aiResult.comments || []).map((f: any) => ({
+            path: f.file || f.path || "",
+            line: f.line_start || f.line || undefined,
+            body: f.message || f.text || f.body || ""
+          }));
+
+          // Use createReview so we can add inline comments
+          await github.createReview(repo, pr_number, {
+            body: `AI review from slack (posted by user)`,
+            event: "COMMENT",
+            comments
+          });
+        }
+        break;
 
         case "mark_false_positive":
           logger.warn(`False positive for PR ${pr_number}`);

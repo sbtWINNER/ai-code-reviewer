@@ -1,4 +1,4 @@
-import { Rule } from "../rule.engine";
+import { Rule } from "../rule.engine.ts";
 
 export const longFunctionRule: Rule = {
   id: "long_function",
@@ -6,10 +6,10 @@ export const longFunctionRule: Rule = {
   severity: "improvement",
 
   run(content, filePath) {
-    const findings = [];
+    const findings: any[] = [];
     const lines = content.split("\n");
 
-    let functionStart = null;
+    let functionStart: number | null = null;
 
     lines.forEach((line, index) => {
       if (line.includes("function ") || line.includes("=> {")) {

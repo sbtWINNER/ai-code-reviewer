@@ -12,6 +12,10 @@ export class GithubWebhookController {
     }
 
     // GitHub всегда отправляет JSON, мы его парсим вручную
+    if (!raw || typeof raw !== 'string') {
+      return res.status(400).send("Missing or invalid raw body");
+    }
+
     let payload;
     try {
       payload = JSON.parse(raw);

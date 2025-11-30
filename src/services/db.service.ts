@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { config } from "../config/env";
+import { config } from "../config/env.ts";
 
 const pool = new Pool({ connectionString: config.DATABASE_URL });
 

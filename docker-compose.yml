@@ -1,0 +1,84 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: reviewer-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: reviewer
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: reviewer-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: .
+    container_name: reviewer-worker
+    restart: always
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/reviewer
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NODE_ENV: production
+    depends_on:
+      - postgres
+      - redis
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: bullboard
+    container_name: reviewer-dashboard
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+    restart: always
+
+  webhook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reviewer-webhook
+    command: ["npx", "ts-node", "--transpile-only", "src/server/webhook.ts"]
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: development
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: ${DATABASE_URL}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      GITHUB_WEBHOOK_SECRET: ${GITHUB_WEBHOOK_SECRET}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      PORT: ${PORT}
+    depends_on:
+      - redis
+      - postgres
+    restart: always
+
+  # ngrok:
+  #   image: ngrok/ngrok:latest
+  #   container_name: reviewer-ngrok
+  #   restart: unless-stopped
+  #   # explicit command: подключаемся к контейнеру webhook:4000, логим в stdout, отключаем инспект и ставим region (по желанию)
+  #   command:
+  #     ["http", "webhook:4000", "--log=stdout", "--inspect=false", "--region=eu"]
+  #   environment:
+  #     NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+  #   depends_on:
+  #     - webhook
+  #   networks:
+  #     - default
+
+volumes:
+  postgres_data:

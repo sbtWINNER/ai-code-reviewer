@@ -1,4 +1,4 @@
-import { Rule } from "../rule.engine";
+import { Rule } from "../rule.engine.ts";
 
 export const bannedPatternRule: Rule = {
   id: "banned_pattern",
@@ -7,7 +7,7 @@ export const bannedPatternRule: Rule = {
 
   run(content, filePath) {
     const banned = ["eval(", "new Function("];
-    const findings = [];
+    const findings: any[] = [];
 
     banned.forEach(pattern => {
       if (content.includes(pattern)) {

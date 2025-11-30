@@ -1,4 +1,4 @@
-export function buildSlackReviewMessage({ repo, pr_number, result, duration }) {
+export function buildSlackReviewMessage({ repo, pr_number, result, duration }: { repo: string; pr_number: number; result: any; duration?: number }) {
   return {
     channel: process.env.SLACK_CHANNEL_ID,
 
@@ -29,7 +29,7 @@ export function buildSlackReviewMessage({ repo, pr_number, result, duration }) {
 
       { type: "divider" },
 
-      ...result.findings.slice(0, 10).map(f => ({
+      ...result.findings.slice(0, 10).map((f: any) => ({
         type: "section",
         text: {
           type: "mrkdwn",
